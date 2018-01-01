@@ -1,58 +1,109 @@
 //conventions:
-//Param order Canvas,Board,Hex,x,y,s
-//
+//Param order ctx,Hex,x,y,s
 
-board = {};
 
 basehex = {
-    color :"red"
+    hexType:"Water"
 };
 
-board.drawHex = function(ctx,hex,x,y,s){ 
-    ctx.fillStyle = hex.color;
+basehex.string = function(){
+    res = this.hexType + " ";
+    switch(this.hexType){
+        case "Water" , "Land": return res;
+    }
+    if (this.constituency ) {
+        res += this.constituency;
+    }
+    return res
+}
+
+baseboard = {};
+
+baseboard.getColor = function(hex){
+    switch (hex.hexType){
+        case "Water" : return "aqua";
+        case "Land" : return "brown";
+    }
+    if (hex.constituency) {
+        let a = this.country.constits[hex.constituency];
+        if (a) {
+            console.log("a = ",a);
+            return a.Color;
+        }
+        console.log("no value for" ,hex);
+    }
+
+    console.log("Black for" ,hex);
+
+    return "black";
+    
+}
+
+baseboard.drawHex = function(ctx,hex,x,y,s){ 
+    ctx.fillStyle = this.getColor(hex);
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
     ctx.fillRect(x,y,s,s);
     ctx.strokeRect(x,y,s,s);
+
+
+    switch( hex.hexType){
+        case "City": 
+            ctx.fillStyle= "black";
+            ctx.fillRect(x+s/4,y+s/4,s/2,s/2);
+            break;
+        case "L-Town":
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(x + s/2,y+s/2,s/4,0,2*Math.PI);
+            ctx.fill();
+            break;
+        case "S-Town":
+            ctx.strokeStyle = "black";
+            ctx.beginPath();
+            ctx.arc(x + s/2,y+s/2,s/4,0,2*Math.PI);
+            ctx.stroke();
+    }
+    
 }
 
-board.nToXy = function(b,n){
+baseboard.nToXy = function(n){
     return {
-        x : n % b.w ,
-        y : Math.floor(n / b.w)
+        x : n % this.w ,
+        y : Math.floor(n / this.w)
     }
 }
 
-board.xyToN = function(b,x,y){
+baseboard.xyToN = function(x,y){
     if (y === undefined ){
-        return x.x + x.y * b.w;
+        return x.x + x.y * this.w;
     }
-    return x + y * b.w;
+    return x + y * this.w;
 }
 
 
-board.drawBoard = function(ctx,b,w,h){ 
-    s = Math.min(w/ b.w, (h+0.5)/b.h);
-    console.log("S:" ,s)
-    for (p in b.map) {
-        xy = board.nToXy(b,p); 
+baseboard.draw = function(ctx,w,h){ 
+    s = Math.min(w/ this.w, (h+0.5)/this.h);
+    console.log("S:" ,s, this.map.length)
+    for (p in this.map) {
+        xy = this.nToXy(p); 
         yp = xy.x %2 === 0 ? 0 : s/2;
-        board.drawHex(ctx,b.map[p],s*xy.x,yp + s*xy.y,s); 
+        this.drawHex(ctx,this.map[p],s*xy.x,yp + s*xy.y,s); 
     }
 }
 
-board.mposToXy = function(b,mx,my,w,h){
-    s = Math.min(w/ b.w, (h+0.5)/b.h);
+baseboard.mposToXy = function(mx,my,w,h){
+    s = Math.min(w/ this.w, (h+0.5)/this.h);
     
     hexx = Math.floor(mx / s)
 
-    if (hexx > b.w) return undefined;
+    if (hexx > this.w) return undefined;
     
     yp = hexx %2 === 0 ? 0 : s/2;
 
     hexy = Math.floor( (my - yp) / s)
 
-    if (hexy > b.h )return undefined;
+    if (hexy > this.h )return undefined;
     return {
         x:hexx,
         y:hexy
@@ -61,12 +112,16 @@ board.mposToXy = function(b,mx,my,w,h){
 
 
 //w and h cannot be zero
-function Board(w,h){
-    var res = {w:w, h:h, map:[]}
-    for (var i = 0; i < w; i++ ){
-        for (var j = 0; j < h; j++ ){
-            res.map[board.xyToN(res,i,j)] = Object.create(basehex);
-        }
+function Board(w,h,country){
+    res = Object.create(baseboard);
+    res.w = w;
+    res.h = h;
+    res.country = country;
+    res.map = [];
+    fsize = w*h;
+
+    for (var i = 0; i < fsize; i++ ){
+            res.map[i] = Object.create(basehex);
     }
     return res;
 }

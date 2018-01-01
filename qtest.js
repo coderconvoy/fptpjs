@@ -1,41 +1,75 @@
+//dep uk.js
+//dep board.js
+//dep canvas.js
 
 
-b = Board(9,13);
+board = Board(9,13,uk);
 
-const dw = 200
-const dh = 400
+const dw = 400
+const dh = 500
 
 cancan.draw = function(ctx){
-    board.drawBoard(ctx,b,dw,dh);
+    board.drawBoard(ctx,dw,dh);
 }
-board.drawBoard(ctx,b,dw,dh);
 
+can.onmousemove = cancan.mouser(function(e,x,y){ 
+    let bxy = board.mposToXy(x,y,dw,dh)
+
+    if (bxy == undefined) {
+        return;
+    }
+
+    let mapn = board.xyToN(bxy);
+    item = board.map[mapn];
+    let cs = document.getElementById("currstr");
+    cs.innerHTML = item.string();
+})
 
 can.onmousedown = cancan.mouser(function(e,x,y){
-    console.log(e,x,y);
-    let bxy = board.mposToXy(b,x,y,dw,dh)
+    let bxy = board.mposToXy(x,y,dw,dh)
 
     if (!bxy) {
         return;
     }
     
-    let mapn = board.xyToN(b,bxy);
-    item = b.map[mapn];
-    country = document.getElementById("sel_country").value;
+    let mapn = board.xyToN(bxy);
+    item = board.map[mapn];
+    htype = document.getElementById("sel_type").value;
     constituency = document.getElementById("sel_const").value;
 
-    item.country = country;
+    item.hexType = htype;
     item.constituency = constituency;
 
-    
-
-
-    
-    console.log("click:" + bxy.x,bxy.y);
-    board.drawBoard(ctx,b,dw,dh);
+    board.draw(ctx,dw,dh);
 
 })
 
+function outputJSON(){
+    let ta = document.getElementById("textout");
+    ta.value = JSON.stringify(board); 
+}
 
+function inputJSON(){
+    let ta = document.getElementById("textout");
+    ob = JSON.parse(ta.value);
+    
+    let b = Board(ob.w,ob.h,ob.country);
+    for (p in b.map ){
+        Object.assign(b.map[p],ob.map[p]);
+    }
 
+    board = b;
+    board.draw(ctx,dw,dh);
+}
 
+//Init Code
+
+let s_const = document.getElementById("sel_const")
+for (p in uk.constits){
+    let op = document.createElement("option");
+    op.value = p;
+    op.innerHTML = p;
+    s_const.appendChild(op);
+}
+
+board.draw(ctx,dw,dh);
