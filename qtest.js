@@ -3,7 +3,7 @@
 //dep canvas.js
 
 
-board = Board(9,13,uk);
+board = Board(uk.w,uk.h,uk.country);
 
 const dw = 400
 const dh = 500
@@ -38,6 +38,7 @@ can.onmousedown = cancan.mouser(function(e,x,y){
     constituency = document.getElementById("sel_const").value;
 
     item.hexType = htype;
+    if (constituency != "_" )
     item.constituency = constituency;
 
     board.draw(ctx,dw,dh);
@@ -65,7 +66,11 @@ function inputJSON(){
 //Init Code
 
 let s_const = document.getElementById("sel_const")
-for (p in uk.constits){
+let op = document.createElement("option");
+op.value = "_";
+op.innerHTML = "_";
+s_const.appendChild(op);
+for (p in uk.country){
     let op = document.createElement("option");
     op.value = p;
     op.innerHTML = p;

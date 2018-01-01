@@ -25,7 +25,7 @@ baseboard.getColor = function(hex){
         case "Land" : return "brown";
     }
     if (hex.constituency) {
-        let a = this.country.constits[hex.constituency];
+        let a = this.country[hex.constituency];
         if (a) {
             console.log("a = ",a);
             return a.Color;

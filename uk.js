@@ -1,6 +1,8 @@
 
 uk = {
-    constits : {
+    w:11,
+    h:13,
+    country : {
         Edinburgh :{
             Country:"Scotland",
             Color:"Green"
