@@ -43,8 +43,17 @@ baseboard.drawHex = function(ctx,hex,x,y,s){
     ctx.fillStyle = this.getColor(hex);
     ctx.strokeStyle = "black";
     ctx.lineWidth = 1;
-    ctx.fillRect(x,y,s,s);
-    ctx.strokeRect(x,y,s,s);
+    ctx.beginPath();
+    //ctx.fillRect(x,y,s,s);
+    ctx.moveTo(x+s*0.1,y);
+    ctx.lineTo(x+s*0.9,y);
+    ctx.lineTo(x+s*1.1,y+s/2); 
+    ctx.lineTo(x+s*0.9,y+s);
+    ctx.lineTo(x+s*0.1,y+s);
+    ctx.lineTo(x-s*0.1,y + s/2);
+    ctx.lineTo(x+s*0.1,y);
+    ctx.fill();
+    ctx.stroke();
 
 
     switch( hex.hexType){
