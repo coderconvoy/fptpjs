@@ -92,7 +92,8 @@ baseboard.xyToN = function(x,y){
 
 
 baseboard.draw = function(ctx,w,h){ 
-    s = Math.min(w/ this.w, (h+0.5)/this.h);
+    console.log("Drawing : ",w,h);
+    s = Math.min(w/( this.w + 0.2), (h)/(this.h+0.5));
     console.log("S:" ,s, this.map.length)
     for (p in this.map) {
         xy = this.nToXy(p); 
@@ -102,7 +103,7 @@ baseboard.draw = function(ctx,w,h){
 }
 
 baseboard.mposToXy = function(mx,my,w,h){
-    s = Math.min(w/ this.w, (h+0.5)/this.h);
+    s = Math.min(w/( this.w + 0.2), (h)/(this.h+0.5));
     
     hexx = Math.floor(mx / s)
 
@@ -121,7 +122,7 @@ baseboard.mposToXy = function(mx,my,w,h){
 
 
 //w and h cannot be zero
-function Board(w,h,country){
+function Board(w,h,country,map){
     res = Object.create(baseboard);
     res.w = w;
     res.h = h;
@@ -132,6 +133,12 @@ function Board(w,h,country){
     for (var i = 0; i < fsize; i++ ){
             res.map[i] = Object.create(basehex);
     }
+    if (map !== undefined) {
+        for (p in res.map ){
+            Object.assign(res.map[p],ob.map[p]);
+        }
+    }
+
     return res;
 }
 

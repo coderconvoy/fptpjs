@@ -1,19 +1,18 @@
-//dep uk.js
+//dep ukcities.js
 //dep board.js
 //dep canvas.js
 
 
 board = Board(uk.w,uk.h,uk.country);
+cancan = readyCanvas(document.getElementById("cancan")); 
 
-const dw = 400
-const dh = 500
 
 cancan.draw = function(ctx){
-    board.drawBoard(ctx,dw,dh);
+    board.draw(cancan.ctx,cancan.width,cancan.height);
 }
 
-can.onmousemove = cancan.mouser(function(e,x,y){ 
-    let bxy = board.mposToXy(x,y,dw,dh)
+cancan.onmousemove = cancan.mouser(function(e,x,y){ 
+    let bxy = board.mposToXy(x,y,cancan.width,cancan.height)
 
     if (bxy == undefined) {
         return;
@@ -25,8 +24,8 @@ can.onmousemove = cancan.mouser(function(e,x,y){
     cs.innerHTML = item.string();
 })
 
-can.onmousedown = cancan.mouser(function(e,x,y){
-    let bxy = board.mposToXy(x,y,dw,dh)
+cancan.onmousedown = cancan.mouser(function(e,x,y){
+    let bxy = board.mposToXy(x,y,cancan.width,cancan.height)
 
     if (!bxy) {
         return;
@@ -41,7 +40,7 @@ can.onmousedown = cancan.mouser(function(e,x,y){
     if (constituency != "_" )
     item.constituency = constituency;
 
-    board.draw(ctx,dw,dh);
+    board.draw(cancan.ctx,cancan.width,cancan.height);
 
 })
 
@@ -55,12 +54,9 @@ function inputJSON(){
     ob = JSON.parse(ta.value);
     
     let b = Board(ob.w,ob.h,ob.country);
-    for (p in b.map ){
-        Object.assign(b.map[p],ob.map[p]);
-    }
 
     board = b;
-    board.draw(ctx,dw,dh);
+    board.draw(cancan.ctx,cancan.width,cancan.height);
 }
 
 //Init Code
@@ -77,4 +73,4 @@ for (p in uk.country){
     s_const.appendChild(op);
 }
 
-board.draw(ctx,dw,dh);
+board.draw(cancan.ctx,cancan.width,cancan.height);
