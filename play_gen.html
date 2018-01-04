@@ -5,25 +5,9 @@
     </head>
     <body>
 
-        <div id="options" style="margin:5px;">
-            Type:<select id="sel_type">
-                <option value="City">City</option>
-                <option value="L-Town">L-Town</option>
-                <option value="S-Town">S-Town</option>
-                <option value="Rural">Rural</option>
-                <option value="Water">Water</option>
-                <option value="Land">Land</option>
-            </select>
-            Constituency:<select id="sel_const">
-            </select>
-            <span id="currstr"></span>
-        </div>
         <div>
-            <canvas id="cancan" style="width:60vw; height:70vh;" ></canvas>
+            <canvas id="cancan" style="width:60vw; height:90vh;" ></canvas>
         </div>
-        <textarea rows="20" cols="60" id="textout"></textarea>
-            <button onclick="outputJSON()">Output JSON</button>
-            <button onclick="inputJSON()">Input JSON</button>
 
         {{jsdep "play.js"}}
 
