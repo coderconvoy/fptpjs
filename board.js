@@ -111,6 +111,7 @@ baseboard.fillHex = function(ctx,hex,x,y,s){
             break;
         case "S-Town":
             ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.arc(x + s/2,y+s/2,s/4,0,2*Math.PI);
             ctx.stroke();
@@ -257,6 +258,7 @@ baseboard.adjacent = function(n,allowU){
 
 //Returns if a hex can connect to it's city, without the noUse hex
 baseboard.cityConnect = function(n,noUse){
+    console.log("City Connect", n,noUse);
     let members = [n];
     let i = 0;
     while(true){
@@ -300,7 +302,19 @@ baseboard.tryGerrymander = function(n,constit){
         return false;
     }
     console.log("tg - is connected to new constit");
-    // todo check no break in constituency
+    
+    // check no break in constituency
+
+    for (let a = 0; a < adj.length; a++ ) {
+        console.log("checkbreak a = ",a)
+        let ma = adj[a];
+        let mpa = this.map[ma];
+        if (!mpa.inBoard()) continue;
+        //if (mpa.constituency !== chex.constituency)continue
+        if (this.cityConnect(ma,n)) continue
+        return false
+    }
+
 
     this.map[n].constituency = constit;
     return true;

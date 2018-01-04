@@ -26,4 +26,8 @@ can.onmousedown = can.mouser(function(e,x,y){
 });
 
 
+function tg(n,c){
+    board.tryGerrymander(n,c);
+    can.draw(); 
+}
 can.draw();
