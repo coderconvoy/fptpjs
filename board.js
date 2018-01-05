@@ -283,13 +283,11 @@ baseboard.cityConnect = function(n,noUse){
 
 
 baseboard.tryGerrymander = function(n,constit){
+    //todo add check on two constits of same colour touching
     let chex = this.map[n];
-    console.log("try gerry",n, constit);
     if (chex.constituency == constit) return false;
-    console.log("tg - is change");
     
     if (chex.hexType != "Rural") return false;
-    console.log("tg - is rural");
     adj = this.adjacent(n);
     conFound = false;
     for (let a in adj){
@@ -301,8 +299,10 @@ baseboard.tryGerrymander = function(n,constit){
     if (! conFound){
         return false;
     }
-    console.log("tg - is connected to new constit");
     
+    // check same country
+    if (this.country[chex.constituency].Country !== this.country[constit].Country) return false;
+
     // check no break in constituency
 
     for (let a = 0; a < adj.length; a++ ) {
