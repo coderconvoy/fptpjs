@@ -3,14 +3,14 @@
 //dep canvas.js
 //dep player.js
 //dep deck.js
-//dep layout.js
+//dep layout/rowcol.js
 
 
 board = Board(uk.w,uk.h,uk.country,uk.map);
 board.setBorders();
 can = readyCanvas(document.getElementById("cancan"));
 
-lay = RowLayout("red");
+lay = RowColLayout("red",1);
 
 lay.add(board,2);
 lay.add(board,1); //dumb experiment, 2 of the same object on display
@@ -38,11 +38,10 @@ board.onmousedown = function(e,x,y,w,h){
     }
     let mapn = board.xyToN(bxy);
     let hex = board.map[mapn];
-    if (last_city === ""){
-        if (hex.hexType === "City"){
-            last_city = hex.constituency;
-            console.log("Choosing",last_city);
-        }
+
+    if (hex.hexType === "City"){
+        last_city = hex.constituency;
+        console.log("Choosing",last_city);
         return;
     }
     console.log("changing",mapn,last_city);
