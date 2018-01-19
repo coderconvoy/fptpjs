@@ -13,7 +13,7 @@ baserow.draw = function(ctx,w,h){
         tw += this.children[i].frac;
     }
     if (tw === 0){
-        this.fillbg(ctx,bg,w,h);
+        this.fillbg(ctx,this.bg,w,h);
         return
     }
     ctx.save()
@@ -73,7 +73,7 @@ basecol.draw = function(ctx,w,h){
         tw += this.children[i].frac;
     }
     if (tw === 0){
-        this.fillbg(ctx,bg,w,h);
+        this.fillbg(ctx,this.bg,w,h);
         return
     }
     ctx.save()

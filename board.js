@@ -133,47 +133,27 @@ baseboard.xyToN = function(x,y){
     return x + y * this.w;
 }
 
-baseboard.setBorders = function() {
-    //special edges
-    for (p in this.map){
-        let mp = this.map[p];
-        if (! mp.inBoard()) continue
-
-        let adj = this.adjacent(p,true);
-        for (let a = 0; a < adj.length; a++) {
-            if (adj[a] === undefined) continue;
-            let ma = this.map[adj[a]];
-            if (! ma.inBoard()) continue
-
-            if (this.country[ma.constituency].Country === this.country[mp.constituency].Country ) continue
-            if (mp.border == undefined) mp.border = [];
-            mp.border.push(a);
-            
-        }
-
-    }
-}
 
 baseboard.draw = function(ctx,w,h){ 
     console.log("Drawing : ",w,h);
     s = Math.min(w/( this.w + 0.2), (h)/(this.h+0.5));
-    console.log("S:" ,s, this.map.length)
+    console.log("S:" ,s, this.hmap.length)
     //fill
-    for (p in this.map) {
+    for (p in this.hmap) {
         let xy = this.nToXy(p); 
         let yp = (xy.x %2) * s/2 ;
-        this.fillHex(ctx,this.map[p],s*xy.x,yp + s*xy.y,s); 
+        this.fillHex(ctx,this.hmap[p],s*xy.x,yp + s*xy.y,s); 
     }
     //normal edges
-    for (p in this.map) {
+    for (p in this.hmap) {
         let xy = this.nToXy(p); 
         let yp = (xy.x %2) * s/2 ;
-        this.strokeHex(ctx,this.map[p],s*xy.x,yp + s*xy.y,s); 
+        this.strokeHex(ctx,this.hmap[p],s*xy.x,yp + s*xy.y,s); 
     }
     //special edges
 
-    for (p in this.map) {
-        mp = this.map[p];
+    for (p in this.hmap) {
+        mp = this.hmap[p];
         if (mp.border === undefined) continue;
         let xy = this.nToXy(p); 
         let yp = (xy.x %2) * s/2 ;
@@ -184,7 +164,17 @@ baseboard.draw = function(ctx,w,h){
             this.hexEdge(ctx,s*xy.x,yp + s*xy.y,s,mp.border[a]);
         }
         ctx.stroke();
-        
+    }
+
+    //Battle Bus
+    if (this.battlebus !== undefined){
+        xy = this.nToXy(this.battlebus);
+        let yp = (xy.x %2) * s/2 ;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "red";
+        ctx.lineWidth = w /300;
+        ctx.fillRect(s*xy.x,yp + s*xy.y,s/2,s/2);
+        ctx.strokeRect(s*xy.x,yp + s*xy.y,s/2,s/2);
     }
 }
 
@@ -263,12 +253,12 @@ baseboard.cityConnect = function(n,noUse){
     let i = 0;
     while(true){
         let mi = members[i];
-        let mpi = this.map[mi];
+        let mpi = this.hmap[mi];
         if (mpi.hexType === "City") return true;
         let adj = this.adjacent(mi);
         for (let a = 0; a < adj.length; a++) {
             let ma = adj[a]
-            let mpa = this.map[ma]
+            let mpa = this.hmap[ma]
             if (ma === noUse) continue;
             if (!mpa.inBoard()) continue
             if (mpa.constituency !== mpi.constituency) continue;
@@ -284,14 +274,14 @@ baseboard.cityConnect = function(n,noUse){
 
 baseboard.tryGerrymander = function(n,constit){
     //todo add check on two constits of same colour touching
-    let chex = this.map[n];
+    let chex = this.hmap[n];
     if (chex.constituency == constit) return false;
     
     if (chex.hexType != "Rural") return false;
     adj = this.adjacent(n);
     conFound = false;
     for (let a in adj){
-        if (this.map[adj[a]].constituency == constit){
+        if (this.hmap[adj[a]].constituency == constit){
             conFound = true;
             break;
         }
@@ -308,7 +298,7 @@ baseboard.tryGerrymander = function(n,constit){
     for (let a = 0; a < adj.length; a++ ) {
         console.log("checkbreak a = ",a)
         let ma = adj[a];
-        let mpa = this.map[ma];
+        let mpa = this.hmap[ma];
         if (!mpa.inBoard()) continue;
         //if (mpa.constituency !== chex.constituency)continue
         if (this.cityConnect(ma,n)) continue
@@ -316,30 +306,51 @@ baseboard.tryGerrymander = function(n,constit){
     }
 
 
-    this.map[n].constituency = constit;
+    this.hmap[n].constituency = constit;
     return true;
 }
 
+baseboard.setBorders = function() {
+    //special edges
+    for (let p in this.hmap){
+        //console.log("setBorder - ",p);
+        let mp = this.hmap[p];
+        if (! mp.inBoard()) continue
+
+        let adj = this.adjacent(p,true);
+        for (let a = 0; a < adj.length; a++) {
+            if (adj[a] === undefined) continue;
+            let ma = this.hmap[adj[a]];
+            if (! ma.inBoard()) continue
+
+            if (this.country[ma.constituency].Country === this.country[mp.constituency].Country ) continue
+            if (mp.border == undefined) mp.border = [];
+            mp.border.push(a);
+        }
+    }
+}
 //w and h cannot be zero
 function Board(w,h,country,map){
-    res = Object.create(baseboard);
+    let res = Object.create(baseboard);
     res.w = w;
     res.h = h;
     res.country = country;
-    res.map = [];
+    res.battlebus = 20;
+
+    res.hmap = [];
     fsize = w*h;
 
     for (var i = 0; i < fsize; i++ ){
-            res.map[i] = Object.create(basehex);
+            res.hmap[i] = Object.create(basehex);
     }
 
     if (map !== undefined) {
-        for (p in res.map ){
-            Object.assign(res.map[p],map[p]);
+        for (p in res.hmap ){
+            Object.assign(res.hmap[p],map[p]);
         }
     }
 
-
+    res.setBorders();
     return res;
 }
 
