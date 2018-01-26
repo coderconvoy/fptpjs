@@ -2,12 +2,15 @@
 basedeck = {}
 
 function shuffle(ar){
+    console.log("shuffling");
     for (let i = 0; i < ar.length; i++){
-        let r = Math.floor(Math.random(ar.length))
+        let r = Math.floor(Math.random() *ar.length);
+        console.log("shuff -r : ", r)
         let sw = ar[i];
         ar[i] = ar[r];
         ar[r] = sw;
     }
+    console.log(ar);
 }
 
 basedeck.draw = function(n){

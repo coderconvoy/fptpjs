@@ -40,8 +40,8 @@ baserow.getxy = function(w,h,mx,my){
         let child = this.children[i];
         let aw = child.frac * w / tw;
         if (mx-dist < aw ) {
-            if (child.c.digxy !== undefined)
-                return child.c.digxy(aw,h,mx-dist,my);
+            if (child.c.getxy !== undefined)
+                return child.c.getxy(aw,h,mx-dist,my);
 
             return {c:child.c,x:mx-dist,y:my,w:aw,h:h}
             
@@ -100,8 +100,8 @@ basecol.getxy = function(w,h,mx,my){
         let child = this.children[i];
         let ah = child.frac * h / tw;
         if (my-dist < ah ) {
-            if (child.c.digxy !== undefined)
-                return child.c.digxy(w,ah,mx,my-dist);
+            if (child.c.getxy !== undefined)
+                return child.c.getxy(w,ah,mx,my-dist);
 
             return {c:child.c,x:mx,y:my-dist,w:w,h:ah}
             

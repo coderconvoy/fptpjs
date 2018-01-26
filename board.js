@@ -335,7 +335,7 @@ function Board(w,h,country,map){
     res.w = w;
     res.h = h;
     res.country = country;
-    res.battlebus = 20;
+    res.battlebus = undefined;
 
     res.hmap = [];
     fsize = w*h;
