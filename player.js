@@ -12,7 +12,17 @@ baseplayer.draw = function(ctx,w,h){
     let cw = w/7;
     let ch = Math.min(h/2,w/3)
     ctx.lineWidth = cw/8;
+
+    if (this.turn) {
+        ctx.fillStyle = "White";
+        ctx.strokeStyle = "Black";
+        ctx.fillRect(0,0,w/3,h/4);
+        ctx.strokeRect(0,0,w/3,h/4);
+        ctx.fillStyle = "black";
+        ctx.fillText("TURN",w/6,h/5);
+    }
     
+    //draw (display)cards 
     for (let i = 0; i < this.hand.length; i++ ){
         ctx.fillStyle = "white";
         if (this.chosen === i) {
@@ -27,8 +37,24 @@ baseplayer.draw = function(ctx,w,h){
             ctx.fillText(this.hand[i],i*cw + cw/2,h/2+ch/2);
         }
     }
+
+    //show Score
+    
+    ctx.font = `${w/10}pt Arial`;
+    ctx.fillStyle = "white";
+    ctx.fillText (this.score || 0, w*3/4, h/3);
 }
 
+
+baseplayer.drawBudgetTo = function(n){
+    console.log("Player :", this.pnum , "Draw budget to ",n);
+    let ndraw = n - this.hand.length;
+    if (ndraw < 0) return;
+    this.hand.push(...this.bdeck.draw(ndraw)); 
+    
+    
+    
+}
 
 baseplayer.discardBudget = function(n){
     if (n === undefined) n = this.chosen;
@@ -46,6 +72,7 @@ baseplayer.chooseBudget = function(n){
     this.chosen = Math.floor(Math.random() * this.hand.length);
     return this.chosen;
 }
+
 
 baseplayer.mouseSelectBudget = function(x,y,w,h){
     let cw = w/7;
@@ -89,6 +116,7 @@ function Players(n,bud_deck){
         }
         t = (t +1)% res.length;
         res[t].turn = true;
+        res[t].drawBudgetTo(res.length + 2);
         return t;
     }
     res[0].turn = true;

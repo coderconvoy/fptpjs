@@ -87,6 +87,17 @@ function voteProvince(){
     let hex = board.hmap[board.battlebus];
     hex.owner = players[bestp];
     board.battlebus = undefined;
+    let pt = players.endTurn();
+    if (pt != 0){
+        board.randomBattle();
+    }
+    let cRes = board.calculate();
+    for (let i = 0; i < players.length; i++){
+        let sc = cRes[i];
+        if (sc === undefined) sc = 0;
+        players[i].score = sc;
+    }
+
     can.draw();
 }
 

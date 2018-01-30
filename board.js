@@ -2,6 +2,17 @@
 //Param order ctx,Hex,x,y,s
 
 
+//odd util function for handling undefined
+function inc(ar,loc,n){
+    if (n === undefined) n = 1;
+    if (ar[loc] === undefined){
+        ar[loc] = n;
+        return n;
+    }
+    ar[loc] += n;
+    return ar[loc];
+}
+
 basehex = {
     hexType:"Water"
 };
@@ -203,6 +214,22 @@ baseboard.mposToXy = function(mx,my,w,h){
 }
 
 
+baseboard.randomBattle = function(){
+    console.log("Random Battle");
+    let open = [];
+    for (let i = 0; i < this.hmap.length; i++){
+        if (this.hmap[i].owner !== undefined) continue;
+        if (! this.hmap[i].inBoard()) continue;
+        open.push(i);
+    }
+    
+    if (open.length === 0) return undefined;
+
+    this.battlebus = open[Math.floor(Math.random()*open.length)];
+    return this.battlebus;
+
+}
+
 //returns an xy, or 'undefined' for steps off the board
 baseboard.stepXy = function(xy,angle) { 
     let res = {x:xy.x,y:xy.y};
@@ -335,6 +362,75 @@ baseboard.setBorders = function() {
         }
     }
 }
+
+
+baseboard.calculate = function(){
+    //firt build the constituency holders
+    let cscores = {};
+    for (let i = 0; i < this.hmap.length ;i++){
+        let h = this.hmap[i];
+        if ( h.owner === undefined) continue;
+        if (! h.inBoard) continue;
+        if ( cscores[h.constituency] === undefined) 
+            cscores[h.constituency] = {c:[]};
+        let cconst = cscores[h.constituency];
+        let pnum = h.owner.pnum;
+        inc(cscores[h.constituency].c,pnum);
+        console.log("calc:",h.constituency, cscores[h.constituency].c);
+        if (h.hexType === "City") cconst.City = pnum;
+        if (h.hexType === "L-Town") cconst.LTown = pnum;
+        if (h.hexType === "S-Town") cconst.STown = pnum;
+    }
+
+    //Then Calculate winner for each constit
+    let res = [];  
+    for (let i in cscores) {
+        let ci = cscores[i];
+        console.log("in cscores : ",i, ":", ci);
+        let best = -1;
+        let hasbest = [];
+        
+        for (let j = 0; j < ci.c.length; j++){
+            if (ci.c[j] === best) hasbest.push(j);
+            if (ci.c[j] > best) {
+                best = ci.c[j];
+                hasbest = [j]; 
+            }
+        }
+        console.log("hasbest:" ,i,hasbest);
+        // Only one winner.
+        if (hasbest.length === 1) {
+            inc(res,hasbest[0]);
+            continue;
+        }
+        
+        //shared so look for city.
+        
+        if (ci.City && hasbest.indexOf(ci.City) !== -1) {
+            inc(res,ci.City);
+            continue;
+        }
+        //No city- look for L-Town
+        if (ci.LTown && hasbest.indexOf(ci.LTown) !== -1){
+            inc(res,ci.LTown);
+            continue;
+        }
+        //Finally Try S-Town
+        if (ci.STown && hasbest.indexOf(ci.STown) !== -1){
+            inc(res,ci.STown);
+            continue;
+        }
+        
+    }
+    return res;
+    
+
+    //Then add totals for each player
+}
+
+
+
+
 //w and h cannot be zero
 function Board(w,h,country,map){
     let res = Object.create(baseboard);
