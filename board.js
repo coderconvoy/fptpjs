@@ -98,6 +98,10 @@ baseboard.fillHex = function(ctx,hex,x,y,s){
     ctx.fillStyle = this.getColor(hex);
     ctx.fill();
 
+    if (hex.owner) {
+        ctx.fillStyle = hex.owner.pcol;
+        ctx.fillRect(x + s/6, y + s/6, s*4 / 6, s*4/6);
+    }
     switch( hex.hexType){
         case "City": 
             ctx.fillStyle= "black";
@@ -116,6 +120,7 @@ baseboard.fillHex = function(ctx,hex,x,y,s){
             ctx.arc(x + s/2,y+s/2,s/4,0,2*Math.PI);
             ctx.stroke();
     }
+
 }
 
 
@@ -150,9 +155,10 @@ baseboard.draw = function(ctx,w,h){
         let yp = (xy.x %2) * s/2 ;
         this.strokeHex(ctx,this.hmap[p],s*xy.x,yp + s*xy.y,s); 
     }
-    //special edges
+    //special edges and owners
 
     for (p in this.hmap) {
+
         mp = this.hmap[p];
         if (mp.border === undefined) continue;
         let xy = this.nToXy(p); 

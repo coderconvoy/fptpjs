@@ -15,25 +15,47 @@ baseplayer.draw = function(ctx,w,h){
     
     for (let i = 0; i < this.hand.length; i++ ){
         ctx.fillStyle = "white";
+        if (this.chosen === i) {
+            ctx.fillStyle = "grey";
+        }
+
         ctx.strokeStyle = "black";
         ctx.fillRect(i*cw,h/2,cw,ch);
         ctx.strokeRect(i*cw,h/2,cw,ch);
-        if (this.human) {
+        if (this.human || this.chosen === i) {
             ctx.fillStyle = "black";
             ctx.fillText(this.hand[i],i*cw + cw/2,h/2+ch/2);
-            
         }
     }
 }
 
-baseplayer.cardSelect = function(x,y,w,h){
+
+baseplayer.discardBudget = function(n){
+    if (n === undefined) n = this.chosen;
+    if (n === undefined) return;
+    c = this.hand.splice(n,1)[0];
+    this.bdeck.discard(c);
+    this.chosen = undefined;
+    return c;
+}
+
+
+baseplayer.chooseBudget = function(n){
+    this.chosen = n;
+    if (n === undefined) 
+    this.chosen = Math.floor(Math.random() * this.hand.length);
+    return this.chosen;
+}
+
+baseplayer.mouseSelectBudget = function(x,y,w,h){
     let cw = w/7;
     let ch = Math.min(h/2,w/3);
     if (x < 0) return undefined;
     if (y < h/2) return undefined;
     if (x >= cw * this.hand.length) return undefined;
     if (y >= h/2 + ch) return undefined;
-    return Math.floor(x/cw);
+    this.chosen= Math.floor(x/cw);
+    return this.chosen;
 }
 
 

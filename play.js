@@ -15,6 +15,7 @@ lay.add(plLay,1);
 //lay.add(board,1); //dumb experiment, 2 of the same object on display
 //lay.add(board,3); //dumb experiment, 2 of the same object on display
 
+mouseoverrider = undefined;
 
 
 
@@ -40,39 +41,67 @@ can.draw = function(){
 last_city = "";
 
 board.onmousedown = function(e,x,y,w,h){
+    if (players.turn() !== 0) return;
     let bxy = board.mposToXy(x,y,w,h)
     if (bxy === undefined) {
         return;
     }
     let mapn = board.xyToN(bxy);
     let hex = board.hmap[mapn];
-
+    console.log(mapn,hex);
+    if (!hex.inBoard()) return;
     this.battlebus = mapn;
-    if (hex.hexType === "City"){
-        last_city = hex.constituency;
-        console.log("Choosing",last_city);
-        can.draw();
-        return;
-    }
-    console.log("changing",mapn,last_city);
-
-    board.tryGerrymander(mapn,last_city);
-    last_city ="";
     can.draw();
 }
+
 
 players[0].onmousedown= function(e,x,y,w,h){
     
-    let c = this.cardSelect(x,y,w,h);
+    if( board.battlebus === undefined)return;
+    //TODO showmessage "please select battle location"
+    
+    let c = this.mouseSelectBudget(x,y,w,h);
     if (c === undefined) return;
+
+    for (let i = 1; i < players.length; i++){
+        players[i].chooseBudget();
+    }
   
-    let crd = this.hand.splice(c,1)[0];
-    bdeck.discard(crd); 
+    mouseoverrider = underride(voteProvince);
+    can.draw();
+}
+
+function voteProvince(){
+    let best = -1;
+    let bestp = -1;
+    for (let i = 0; i < players.length; i++){
+        let nbest = players[i].discardBudget();
+        if (nbest === undefined) continue;
+        if (nbest > best){
+            best = nbest;
+            bestp = i;
+        }
+    }
+
+    console.log("Winner = ",bestp," with score of ", best);
+    let hex = board.hmap[board.battlebus];
+    hex.owner = players[bestp];
+    board.battlebus = undefined;
     can.draw();
 }
 
 
+function underride(f){
+    return function(){
+        f();
+        mouseoverrider = undefined;
+    }
+}
+
 can.onmousedown = can.mouser(function(e,x,y){
+    if (mouseoverrider ){
+        if (mouseoverrider())return;
+    }
     let dg = lay.getxy(can.width,can.height,x,y);
     if (dg) if (dg.c.onmousedown) dg.c.onmousedown(e,dg.x,dg.y,dg.w,dg.h);
 });
