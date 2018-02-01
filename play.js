@@ -44,31 +44,34 @@ board.onmousedown = function(e,x,y,w,h){
     if (players.turn() !== 0) return;
     let bxy = board.mposToXy(x,y,w,h)
     if (bxy === undefined) {
-        return;
+        return false;
     }
     let mapn = board.xyToN(bxy);
     let hex = board.hmap[mapn];
+    if (hex.owner !== undefined) {
+        return false;
+    }
     console.log(mapn,hex);
-    if (!hex.inBoard()) return;
+    if (!hex.inBoard()) return false;
     this.battlebus = mapn;
-    can.draw();
+    return true; 
 }
 
 
 players[0].onmousedown= function(e,x,y,w,h){
     
-    if( board.battlebus === undefined)return;
+    if( board.battlebus === undefined)return false;
     //TODO showmessage "please select battle location"
     
     let c = this.mouseSelectBudget(x,y,w,h);
-    if (c === undefined) return;
+    if (c === undefined) return false;
 
     for (let i = 1; i < players.length; i++){
         players[i].chooseBudget();
     }
   
     mouseoverrider = underride(voteProvince);
-    can.draw();
+    return true;
 }
 
 function voteProvince(){
@@ -114,7 +117,10 @@ can.onmousedown = can.mouser(function(e,x,y){
         if (mouseoverrider())return;
     }
     let dg = lay.getxy(can.width,can.height,x,y);
-    if (dg) if (dg.c.onmousedown) dg.c.onmousedown(e,dg.x,dg.y,dg.w,dg.h);
+    if (dg) 
+        if (dg.c.onmousedown) 
+            if (dg.c.onmousedown(e,dg.x,dg.y,dg.w,dg.h) )
+                can.draw();
 });
 
 

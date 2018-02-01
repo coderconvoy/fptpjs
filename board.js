@@ -406,17 +406,18 @@ baseboard.calculate = function(){
         
         //shared so look for city.
         
-        if (ci.City && hasbest.indexOf(ci.City) !== -1) {
+        if ((ci.City!== undefined) && hasbest.indexOf(ci.City) !== -1) {
+            console.log("City - winner: ", i,":",ci.City);
             inc(res,ci.City);
             continue;
         }
         //No city- look for L-Town
-        if (ci.LTown && hasbest.indexOf(ci.LTown) !== -1){
+        if ((ci.LTown!== undefined) && hasbest.indexOf(ci.LTown) !== -1){
             inc(res,ci.LTown);
             continue;
         }
         //Finally Try S-Town
-        if (ci.STown && hasbest.indexOf(ci.STown) !== -1){
+        if ((ci.STown !== undefined) && hasbest.indexOf(ci.STown) !== -1){
             inc(res,ci.STown);
             continue;
         }
