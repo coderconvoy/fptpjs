@@ -23,13 +23,13 @@ basemodal.draw = function(ctx,w,h){
 
 basemodal.getxy =  function(w,h,mx,my){
     if (this.modal){
-        if (this.model.getxy)
-            return this.model.getxy(w,h,mx,my);
-        return {child:this.modal,x:mx,y:my,w:w,h:h};
+        if (this.modal.getxy)
+            return this.modal.getxy(w,h,mx,my);
+        return {c:this.modal,x:mx,y:my,w:w,h:h};
     }
     if ( this.child.getxy)
         return this.child.getxy(w,h,mx,my);
-    return {child:this.child,x:mx,y:my,w:w,h:h};
+    return {c:this.child,x:mx,y:my,w:w,h:h};
 }
 
 

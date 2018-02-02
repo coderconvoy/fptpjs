@@ -65,6 +65,10 @@ baseplayer.discardBudget = function(n){
     return c;
 }
 
+baseplayer.chosenBudget = function(){
+    if (this.chosen === undefined) return 0;
+    return this.hand[this.chosen];
+}
 
 baseplayer.chooseBudget = function(n){
     this.chosen = n;
