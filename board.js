@@ -109,14 +109,13 @@ baseboard.fillHex = function(ctx,hex,x,y,s){
     ctx.fillStyle = this.getColor(hex);
     ctx.fill();
 
-    if (hex.owner) {
-        ctx.fillStyle = hex.owner.pcol;
-        ctx.fillRect(x + s/6, y + s/6, s*4 / 6, s*4/6);
-    }
     switch( hex.hexType){
         case "City": 
             ctx.fillStyle= "black";
+            if (hex.cityWinner !== undefined) ctx.fillStyle = hex.cityWinner.pcol;
+            ctx.strokeStyle = "black";
             ctx.fillRect(x+s/4,y+s/4,s/2,s/2);
+            ctx.strokeRect(x+s/4,y+s/4,s/2,s/2);
             break;
         case "L-Town":
             ctx.fillStyle = "black";
@@ -132,6 +131,15 @@ baseboard.fillHex = function(ctx,hex,x,y,s){
             ctx.stroke();
     }
 
+    if (hex.owner) {
+        ctx.fillStyle = hex.owner.pcol;
+        ctx.lineStyle = "black";
+        ctx.beginPath();
+        ctx.arc(x +s*3/4,y + s/4,s/6,0,2*Math.PI);
+        ctx.stroke();
+        ctx.fill();
+
+    }
 }
 
 
@@ -366,18 +374,25 @@ baseboard.setBorders = function() {
 
 baseboard.calculate = function(){
     //firt build the constituency holders
+    let hmap = this.hmap; //for closures
+    let players = [];
     let cscores = {};
     for (let i = 0; i < this.hmap.length ;i++){
         let h = this.hmap[i];
-        if ( h.owner === undefined) continue;
         if (! h.inBoard) continue;
         if ( cscores[h.constituency] === undefined) 
             cscores[h.constituency] = {c:[]};
         let cconst = cscores[h.constituency];
+        if (h.hexType === "City") cconst.CityAddress = i;
+        if ( h.owner === undefined) continue;
         let pnum = h.owner.pnum;
-        inc(cscores[h.constituency].c,pnum);
-        console.log("calc:",h.constituency, cscores[h.constituency].c);
-        if (h.hexType === "City") cconst.City = pnum;
+        players[pnum] = h.owner;
+        inc(cconst.c,pnum);
+        console.log("calc:",h.constituency, cconst.c);
+        if (h.hexType === "City") {
+            cconst.City = pnum;
+            console.log("City Addresser",cconst);
+        }
         if (h.hexType === "L-Town") cconst.LTown = pnum;
         if (h.hexType === "S-Town") cconst.STown = pnum;
     }
@@ -398,9 +413,18 @@ baseboard.calculate = function(){
             }
         }
         console.log("hasbest:" ,i,hasbest);
+
+        let winnerIs = function(n){
+            console.log("winnerIs:" ,i, n);
+            inc(res,n);
+            if (ci.CityAddress === undefined) return;
+            let ch = hmap[ci.CityAddress]
+            ch.cityWinner = players[n];
+        }
+
         // Only one winner.
         if (hasbest.length === 1) {
-            inc(res,hasbest[0]);
+            winnerIs(hasbest[0]);
             continue;
         }
         
@@ -408,25 +432,24 @@ baseboard.calculate = function(){
         
         if ((ci.City!== undefined) && hasbest.indexOf(ci.City) !== -1) {
             console.log("City - winner: ", i,":",ci.City);
-            inc(res,ci.City);
+            winnerIs(ci.City);
             continue;
         }
         //No city- look for L-Town
         if ((ci.LTown!== undefined) && hasbest.indexOf(ci.LTown) !== -1){
-            inc(res,ci.LTown);
+            winnerIs(ci.LTown);
             continue;
         }
         //Finally Try S-Town
         if ((ci.STown !== undefined) && hasbest.indexOf(ci.STown) !== -1){
-            inc(res,ci.STown);
+            winnerIs(ci.STown);
             continue;
         }
+        winnerIs(undefined);
         
     }
     return res;
-    
 
-    //Then add totals for each player
 }
 
 
