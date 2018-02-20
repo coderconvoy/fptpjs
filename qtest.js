@@ -19,7 +19,7 @@ cancan.onmousemove = cancan.mouser(function(e,x,y){
     }
 
     let mapn = board.xyToN(bxy);
-    item = board.map[mapn];
+    item = board.hmap[mapn];
     let cs = document.getElementById("currstr");
     cs.innerHTML = item.string();
 })
@@ -32,7 +32,7 @@ cancan.onmousedown = cancan.mouser(function(e,x,y){
     }
     
     let mapn = board.xyToN(bxy);
-    item = board.map[mapn];
+    item = board.hmap[mapn];
     htype = document.getElementById("sel_type").value;
     constituency = document.getElementById("sel_const").value;
 
