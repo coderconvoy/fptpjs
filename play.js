@@ -1,4 +1,4 @@
-//dep ukmap.js
+//dep assets/ukmap.js
 //dep board.js
 //dep canvas.js
 //dep player.js
@@ -7,7 +7,7 @@
 //dep layout/modal.js
 //dep messagebox.js
 
-board = Board(uk.w,uk.h,uk.country,uk.map);
+board = Board(uk.w,uk.h,uk.constits,uk.map);
 can = readyCanvas(document.getElementById("cancan"));
 
 
@@ -67,7 +67,7 @@ board.onmousedown = function(e,x,y,w,h){
     if (hex.owner !== undefined) {
         return false;
     }
-    console.log(mapn,hex);
+    console.log("Click At: ",mapn,hex);
     if (!hex.inBoard()) return false;
     this.battlebus = mapn;
     return true; 

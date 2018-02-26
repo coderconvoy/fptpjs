@@ -40,7 +40,7 @@ baseboard.getColor = function(hex){
     }
 
     if (hex.constituency) {
-        let a = this.country[hex.constituency];
+        let a = this.constits[hex.constituency];
         if (a) {
             return a.Color;
         }
@@ -155,6 +155,14 @@ baseboard.xyToN = function(x,y){
         return x.x + x.y * this.w;
     }
     return x + y * this.w;
+}
+
+
+baseboard.countryOf = function(npos){ 
+    let h = this.hmap[npos].constituency; 
+    if (this.constits[h] ) return this.constits[h].Country;
+    return undefined;
+
 }
 
 
@@ -313,6 +321,8 @@ baseboard.cityConnect = function(n,noUse){
 }
 
 
+
+
 baseboard.tryGerrymander = function(n,constit){
     //todo add check on two constits of same colour touching
     let chex = this.hmap[n];
@@ -332,7 +342,7 @@ baseboard.tryGerrymander = function(n,constit){
     }
     
     // check same country
-    if (this.country[chex.constituency].Country !== this.country[constit].Country) return false;
+    if (this.constits[chex.constituency].Country !== this.constits[constit].Country) return false;
 
     // check no break in constituency
 
@@ -364,7 +374,7 @@ baseboard.setBorders = function() {
             let ma = this.hmap[adj[a]];
             if (! ma.inBoard()) continue
 
-            if (this.country[ma.constituency].Country === this.country[mp.constituency].Country ) continue
+            if (this.constits[ma.constituency].Country === this.constits[mp.constituency].Country ) continue
             if (mp.border == undefined) mp.border = [];
             mp.border.push(a);
         }
@@ -456,11 +466,11 @@ baseboard.calculate = function(){
 
 
 //w and h cannot be zero
-function Board(w,h,country,map){
+function Board(w,h,constits,map){
     let res = Object.create(baseboard);
     res.w = w;
     res.h = h;
-    res.country = country;
+    res.constits = constits;
     res.battlebus = undefined;
 
     res.hmap = [];
