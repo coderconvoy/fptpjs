@@ -11,6 +11,10 @@ function shuffle(ar){
     console.log(ar);
 }
 
+basedeck.shuffle = function(){
+    shuffle(this.cards);
+}
+
 basedeck.draw = function(n){
     res = [];
     if (n > this.cards.length){

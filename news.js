@@ -1,4 +1,3 @@
-//dep assets/newscards.js
 //dep deck.js
 
 basenews = {}
@@ -16,7 +15,7 @@ function NewsDeck(jsoncards) {
         Object.assign(ncard, jsoncards[i]);
         clist.push(ncard)
     }
-    return = Deck(clist);
+    return  Deck(clist);
 }
 
 

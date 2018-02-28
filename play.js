@@ -6,6 +6,8 @@
 //dep layout/rowcol.js
 //dep layout/modal.js
 //dep messagebox.js
+//dep assets/newscards.js
+//dep news.js
 
 board = Board(uk.w,uk.h,uk.constits,uk.map);
 can = readyCanvas(document.getElementById("cancan"));
@@ -23,6 +25,8 @@ modlay = ModalLayout(lay);
 mouseoverrider = undefined;
 
 
+newsdeck = NewsDeck(newscardlist);
+newsdeck.shuffle();
 
 bdeck = NumDeck(1,50); 
 shuffle(bdeck.cards);
@@ -42,8 +46,8 @@ can.draw = function(){
     //board.draw(can.ctx,can.width,can.height);
 }
 
-function showMessage(title,mess,callback){
-    let mbox = MessageBox(title,mess);
+function showMessage(title,mess,callback,tcol){
+    let mbox = MessageBox(title,mess,"black",tcol);
     
     mbox.onmousedown = function(){
         if (callback) callback();
@@ -88,8 +92,29 @@ players[0].onmousedown= function(e,x,y,w,h){
         players[i].chooseBudget();
     }
     let {bestp,bests}  = provinceWinner();
+    
+    //show winner on board
+    let hex = board.hmap[board.battlebus];
+    hex.owner = players[bestp];
+    //show collected cities on player
+    let cRes = board.calculate();
+    for (let i = 0; i < players.length; i++){
+        let sc = cRes[i];
+        if (sc === undefined) sc = 0;
+        players[i].score = sc;
+    }
   
-    showMessage("Player "+ bestp + " wins province", "Sway : " + bests,voteProvince);
+    showMessage("Player "+ bestp + " wins province", "Sway : " + bests,function(){
+        players.forEach(function(p){
+            p.discardBudget();
+        });
+        board.battlebus = undefined;
+        let pt = players.endTurn();
+        if (pt != 0){
+            board.randomBattle();
+        }
+        can.draw();
+    },players[bestp].pcol);
     return true;
 }
 
@@ -108,29 +133,6 @@ function provinceWinner(discard){
     return {bestp:bestp,bests:best}
 }
 
-function voteProvince(){
-
-    let {bestp,bests} =  provinceWinner()
-    players.forEach(function(p){
-        p.discardBudget();
-    });
-    console.log("Winner = ",bestp," with score of ", bests);
-    let hex = board.hmap[board.battlebus];
-    hex.owner = players[bestp];
-    board.battlebus = undefined;
-    let pt = players.endTurn();
-    if (pt != 0){
-        board.randomBattle();
-    }
-    let cRes = board.calculate();
-    for (let i = 0; i < players.length; i++){
-        let sc = cRes[i];
-        if (sc === undefined) sc = 0;
-        players[i].score = sc;
-    }
-
-    can.draw();
-}
 
 
 function underride(f){
